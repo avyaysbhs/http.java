@@ -12,6 +12,14 @@ public class Logger {
     public static String concat(Object... args) {
         String out = "";
         for (Object arg: args) {
+            out += String.valueOf(arg) + " ";
+        }
+        return out;
+    }
+
+    public static String concatNoSpaces(Object... args) {
+        String out = "";
+        for (Object arg: args) {
             out += String.valueOf(arg);
         }
         return out;

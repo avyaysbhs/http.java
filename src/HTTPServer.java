@@ -19,17 +19,17 @@ public abstract class HTTPServer implements Runnable {
             try {
                 Socket client = socket.accept();
                 BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
-                ArrayList<String> request = new ArrayList<>();
-                String currentLine;
-                do {
+                ArrayList<String> requestLines = new ArrayList<>();
+                String currentLine = in.readLine();
+                while (!(currentLine.isEmpty())) {
+                    requestLines.add(currentLine);
                     currentLine = in.readLine();
-                    if (!currentLine.isEmpty())
-                        request.add(currentLine);
-                } while (!currentLine.isEmpty());
-                in.close();
-                handle(new HttpRequest(request), new HttpResponse());
+                }
+                HttpRequest req = new HttpRequest(HttpRequest.parse(requestLines));
+                HttpResponse res = new HttpResponse(client.getInputStream(), client.getOutputStream());
+                handle(req, res);
             } catch (IOException e) {
-                debug.error("Server error: ", e.getMessage());
+                debug.error("Server error:", e.getMessage());
             }
         }
     }
@@ -39,18 +39,20 @@ public abstract class HTTPServer implements Runnable {
     public void start() {
         try {
             socket = new ServerSocket(this.port);
+            ready = true;
             new Thread(this).start();
         } catch (IOException e) {
-            debug.error("Connection error: ", e.getMessage());
+            debug.error("Connection error:", e.getMessage());
         }
     }
 
     public static void main(String[] args) {
-        (new HTTPServer(8080) {
+        new HTTPServer(8080) {
             @Override
             public void handle(HttpRequest request, HttpResponse response) {
-
+                response.writeHead(200, "text/html");
+                response.end();
             }
-        }).start();
+        }.start();
     }
 }
