@@ -2,7 +2,7 @@ import java.net.*;
 import java.io.*;
 import java.util.ArrayList;
 
-public class HTTPServer implements Runnable {
+public abstract class HTTPServer implements Runnable {
     protected Logger debug;
     private int port;
     private ServerSocket socket;
@@ -27,15 +27,14 @@ public class HTTPServer implements Runnable {
                         request.add(currentLine);
                 } while (!currentLine.isEmpty());
                 in.close();
+                handle(new HttpRequest(request), new HttpResponse());
             } catch (IOException e) {
                 debug.error("Server error: ", e.getMessage());
             }
         }
     }
 
-    public void handle(HttpRequest request, HttpResponse response) {
-
-    }
+    public abstract void handle(HttpRequest request, HttpResponse response);
 
     public void start() {
         try {
@@ -47,6 +46,11 @@ public class HTTPServer implements Runnable {
     }
 
     public static void main(String[] args) {
-        
+        (new HTTPServer(8080) {
+            @Override
+            public void handle(HttpRequest request, HttpResponse response) {
+
+            }
+        }).start();
     }
 }
