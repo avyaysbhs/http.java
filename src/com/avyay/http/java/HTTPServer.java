@@ -1,8 +1,10 @@
+package com.avyay.http.java;
+
 import java.net.*;
 import java.io.*;
 import java.util.ArrayList;
 
-public abstract class HTTPServer implements Runnable {
+abstract class HTTPServer implements Runnable {
     protected Logger debug;
     private int port;
     private ServerSocket socket;
@@ -44,15 +46,5 @@ public abstract class HTTPServer implements Runnable {
         } catch (IOException e) {
             debug.error("Connection error:", e.getMessage());
         }
-    }
-
-    public static void main(String[] args) {
-        new HTTPServer(8080) {
-            @Override
-            public void handle(HttpRequest request, HttpResponse response) {
-                response.writeHead(200, "text/html");
-                response.end();
-            }
-        }.start();
     }
 }

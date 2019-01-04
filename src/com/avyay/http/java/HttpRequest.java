@@ -1,3 +1,5 @@
+package com.avyay.http.java;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,6 +21,5 @@ public class HttpRequest {
     public HttpRequest(HashMap<String, String> fields) {
         type = fields.get("type");
         url = fields.get("url");
-        System.out.println("worked?");
     }
 }

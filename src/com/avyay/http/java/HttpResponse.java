@@ -1,3 +1,5 @@
+package com.avyay.http.java;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -20,6 +22,7 @@ public class HttpResponse {
         HttpResponseCodes.put(401, "Unauthorized");
         HttpResponseCodes.put(403, "Forbidden");
         HttpResponseCodes.put(404, "Not Found");
+        HttpResponseCodes.put(500, "Internal Server Error");
     }
 
     public HttpResponse(InputStream in, OutputStream out) {

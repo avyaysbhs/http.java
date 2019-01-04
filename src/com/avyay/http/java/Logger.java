@@ -1,3 +1,5 @@
+package com.avyay.http.java;
+
 public class Logger {
     private boolean enabled;
 
