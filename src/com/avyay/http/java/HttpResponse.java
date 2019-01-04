@@ -3,7 +3,9 @@ package com.avyay.http.java;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.ArrayList;
 
 public class HttpResponse {
     private boolean ready;
@@ -41,15 +43,16 @@ public class HttpResponse {
         }
     }
 
-    public void writeHead(int HttpResponseCode, String ResponseMIMEType) {
+    private void writeHead(ArrayList<String> fields) {
         if (!headWritten && ready) {
+            String head = "";
+            for (String field : fields) {
+                head += field + "\r\n";
+            }
+            head += "\r\n\r\n";
+            System.out.println(head);
             try {
-                String output = Logger.concatNoSpaces(
-                    "HTTP/1.1 ", String.valueOf(HttpResponseCode), " ", HttpResponseCodes.get(HttpResponseCode), "\r\n",
-                    "Content-Type: ", ResponseMIMEType, "\r\n"
-                );
-                System.out.println(output);
-                out.write(output.getBytes());
+                out.write(head.getBytes());
                 headWritten = true;
             } catch (IOException e) {
                 e.printStackTrace();
@@ -57,8 +60,38 @@ public class HttpResponse {
         }
     }
 
+    private void writeDefaultHeaderFields(ArrayList<String> fields) {
+        fields.add(Logger.concat("Date: ", new Date().toString()));
+        fields.add(Logger.concat("Server: ", "http.java/" + Http.VERSION,
+            "(" + System.getProperty("os.name") + ")", ""
+        ));
+    }
+
+    public void writeHead(int HttpResponseCode, String ResponseMIMEType) {
+        if (!headWritten) {
+            ArrayList<String> output = new ArrayList<>();
+            output.add(Logger.concat("HTTP/1.1", String.valueOf(HttpResponseCode), HttpResponseCodes.get(HttpResponseCode)));
+            writeDefaultHeaderFields(output);
+            output.add(Logger.concat("Content-Type: ", ResponseMIMEType));
+            this.writeHead(output);
+        }
+    }
+
+    public void writeHead(int HttpResponseCode, String ResponseMIMEType, String EncodingCharacterSet) {
+        if (!headWritten) {
+            ArrayList<String> output = new ArrayList<>();
+            output.add(Logger.concat("HTTP/1.1", String.valueOf(HttpResponseCode), HttpResponseCodes.get(HttpResponseCode)));
+            writeDefaultHeaderFields(output);
+            String encoding = (EncodingCharacterSet == null || EncodingCharacterSet.isEmpty()) ? System.getProperty("file.encoding").toLowerCase() : EncodingCharacterSet;
+            output.add(Logger.concat("Content-Type: ", ResponseMIMEType + ";",
+                "charset=" + encoding
+            ));
+            this.writeHead(output);
+        }
+    }
+
     public void writeLine(String... args) {
-        this.write(Logger.concat(args), "\n");
+        this.write(Logger.concat(args), "\r\n");
     }
 
     public void end(String... args) {

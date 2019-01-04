@@ -38,6 +38,10 @@ abstract class HTTPServer implements Runnable {
 
     public abstract void handle(HttpRequest request, HttpResponse response);
 
+    public ServerSocket getSocket() {
+        return socket;
+    }
+
     public void start() {
         try {
             socket = new ServerSocket(this.port);
