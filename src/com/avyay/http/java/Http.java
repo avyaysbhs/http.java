@@ -50,10 +50,12 @@ public class Http {
     }
 
     public static void main(String[] args) {
+        Logger debug = new Logger();
         Http.createServer((req, res) -> {
+            debug.log(req.type);
             res.writeHead(200, "text/html");
             res.writeLine("\r\n");
-            res.end("Hello world!");
+            res.end("<form action=\"/\" method=\"post\"><button>POST!</button></form>");
         }).listen(8080);
     }
 }
