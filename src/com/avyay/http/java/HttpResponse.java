@@ -12,7 +12,7 @@ public class HttpResponse {
     private boolean headWritten = false;
     private OutputStream out;
     private InputStream in;
-    private static HashMap<Integer, String> HttpResponseCodes = new HashMap<Integer, String>();
+    private static HashMap<Integer, String> HttpResponseCodes = new HashMap<>();
 
     static {
         HttpResponseCodes.put(100, "Continue");
@@ -31,6 +31,12 @@ public class HttpResponse {
         this.in = in;
         this.out = out;
         ready = true;
+    }
+
+    public void write(char[] buffer) throws IOException {
+        for (char c: buffer) {
+            out.write(c);
+        }
     }
 
     public void write(String... args) {

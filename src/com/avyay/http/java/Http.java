@@ -41,20 +41,11 @@ public class Http {
         }
     }
 
-    private static Http.Server createServer(HttpRequestHandler handler) {
+    public static Http.Server createServer(HttpRequestHandler handler) {
         return new Http.Server(handler, true);
     }
 
-    private static Http.Server createServer(HttpRequestHandler handler, boolean enableLogs) {
+    public static Http.Server createServer(HttpRequestHandler handler, boolean enableLogs) {
         return new Http.Server(handler, enableLogs);
-    }
-
-    public static void main(String[] args) {
-        Logger debug = new Logger();
-        Http.createServer((req, res) -> {
-            res.writeHead(200, "text/html");
-            res.writeLine("\r\n");
-            res.end("<form action=\"/\" method=\"post\"><button>POST!</button></form>");
-        }).listen(8080);
     }
 }
