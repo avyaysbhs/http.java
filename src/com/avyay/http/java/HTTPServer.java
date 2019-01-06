@@ -23,7 +23,7 @@ abstract class HTTPServer implements Runnable {
                 BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
                 ArrayList<String> requestFeed = new ArrayList<>();
                 String currentLine = in.readLine();
-                while (!(currentLine.isEmpty())) {
+                while (currentLine != null && !(currentLine.isEmpty())) {
                     requestFeed.add(currentLine);
                     currentLine = in.readLine();
                 }

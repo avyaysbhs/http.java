@@ -1,11 +1,9 @@
 package com.avyay.http.java;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.ArrayList;
+import com.sun.corba.se.impl.ior.OldJIDLObjectKeyTemplate;
+
+import java.io.*;
+import java.util.*;
 
 public class HttpResponse {
     private boolean ready;
@@ -13,6 +11,7 @@ public class HttpResponse {
     private OutputStream out;
     private InputStream in;
     private static HashMap<Integer, String> HttpResponseCodes = new HashMap<>();
+    private HashMap<String, String> UserSetHeaderFields = new HashMap<>();
 
     static {
         HttpResponseCodes.put(100, "Continue");
@@ -20,6 +19,7 @@ public class HttpResponse {
         HttpResponseCodes.put(200, "OK");
         HttpResponseCodes.put(201, "Created");
         HttpResponseCodes.put(202, "Accepted");
+        HttpResponseCodes.put(302, "Found");
         HttpResponseCodes.put(400, "Bad Request");
         HttpResponseCodes.put(401, "Unauthorized");
         HttpResponseCodes.put(403, "Forbidden");
@@ -70,6 +70,9 @@ public class HttpResponse {
         fields.add(Logger.concat("Server: ", "http.java/" + Http.VERSION,
             "(" + System.getProperty("os.name") + ")", ""
         ));
+        for (String key: UserSetHeaderFields.keySet()) {
+            fields.add(Logger.concat(key, ": ", UserSetHeaderFields.get(key)));
+        }
     }
 
     public void writeHead(int HttpResponseCode, String ResponseMIMEType) {
@@ -93,6 +96,23 @@ public class HttpResponse {
             ));
             this.writeHead(output);
         }
+    }
+
+    public void writeHead(int HttpResponseCode, String[] lines) {
+        ArrayList<String> output = new ArrayList<>();
+        output.add(Logger.concat("HTTP/1.1", String.valueOf(HttpResponseCode), HttpResponseCodes.get(HttpResponseCode)));
+        for (String line: lines) {
+            output.add(line);
+        }
+        this.writeHead(output);
+    }
+
+    public void setHeader(String key, String value) {
+        UserSetHeaderFields.put(key, value);
+    }
+
+    public void setHeader(String key, Object value) {
+        this.setHeader(key, String.valueOf(value));
     }
 
     public void writeLine(String... args) {
