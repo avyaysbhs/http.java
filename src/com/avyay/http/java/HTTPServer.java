@@ -21,13 +21,13 @@ abstract class HTTPServer implements Runnable {
             try {
                 Socket client = socket.accept();
                 BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
-                ArrayList<String> requestLines = new ArrayList<>();
+                ArrayList<String> requestFeed = new ArrayList<>();
                 String currentLine = in.readLine();
                 while (!(currentLine.isEmpty())) {
-                    requestLines.add(currentLine);
+                    requestFeed.add(currentLine);
                     currentLine = in.readLine();
                 }
-                HttpRequest req = new HttpRequest(HttpRequest.parse(requestLines));
+                HttpRequest req = new HttpRequest(requestFeed);
                 HttpResponse res = new HttpResponse(client.getInputStream(), client.getOutputStream());
                 handle(req, res);
             } catch (IOException e) {
