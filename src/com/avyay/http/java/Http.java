@@ -6,10 +6,10 @@ import java.net.InetAddress;
 public class Http {
     public static final String VERSION = "1.0.0";
 
-    private static class Server {
+    public static abstract class Server {
         protected HttpRequestHandler requestHandler;
         protected Logger console;
-        public String LocalAddress;
+        private String LocalAddress;
 
         public Server(HttpRequestHandler handler, boolean enableLogs) {
             requestHandler = handler;
@@ -42,10 +42,10 @@ public class Http {
     }
 
     public static Http.Server createServer(HttpRequestHandler handler) {
-        return new Http.Server(handler, true);
+        return new Http.Server(handler, true) {};
     }
 
     public static Http.Server createServer(HttpRequestHandler handler, boolean enableLogs) {
-        return new Http.Server(handler, enableLogs);
+        return new Http.Server(handler, enableLogs) {};
     }
 }

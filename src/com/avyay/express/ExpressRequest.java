@@ -6,6 +6,6 @@ public class ExpressRequest {
     private HttpRequest request;
 
     public ExpressRequest(HttpRequest request) {
-        
+
     }
 }

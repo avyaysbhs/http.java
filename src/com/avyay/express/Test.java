@@ -8,6 +8,11 @@ public class Test {
         });
 
         Express.Router router = new Express.Router();
+        app.use(router);
+
+        router.get("/bob", (req, res) -> {
+            res.send("Bob");
+        });
         app.listen(8080);
     }
 }
