@@ -16,16 +16,25 @@ public class ExpressResponse {
         response.end();
     }
 
+    private void sendImage(File file, String MIME) {
+
+    }
+
     private void sendFile(File file, String MIME) throws IOException {
         if (file.exists() && file.canRead()) {
-            FileReader fr = new FileReader(file);
-            char[] buffer = new char[(int) file.length()];
-            if (MIME.contains("octet-stream"))
+            BufferedInputStream in = new BufferedInputStream(
+                new FileInputStream(file)
+            );
+            if (MIME.contains("octet-stream")) {
                 response.setHeader("Content-Length", file.length());
-            fr.read(buffer);
-            response.writeHead(200, MIME);
-            response.write(buffer);
-            response.end();
+                byte[] buffer = new byte[in.available()];
+                in.read(buffer);
+                response.writeHead(200, MIME);
+                response.pipe(buffer);
+                response.end();
+            } else if (MIME.contains("image")) {
+                sendImage(file, MIME);
+            }
         } else {
             throw new FileNotFoundException("Could not find file \""+ file.getName() +"\"");
         }
@@ -35,7 +44,7 @@ public class ExpressResponse {
         try {
             this.sendFile(new File(path), MIMEType);
         } catch (IOException e) {
-            Express.debug.error(e.getMessage());
+            e.printStackTrace();
         }
     }
 

@@ -39,6 +39,10 @@ public class HttpResponse {
         }
     }
 
+    public void pipe(byte[] buffer) throws IOException {
+        out.write(buffer);
+    }
+
     public void write(String... args) {
         if (ready) {
             try {
@@ -56,6 +60,7 @@ public class HttpResponse {
                 head += field + "\r\n";
             }
             head += "\r\n\r\n";
+            System.out.println(head);
             try {
                 out.write(head.getBytes());
                 headWritten = true;
@@ -66,12 +71,12 @@ public class HttpResponse {
     }
 
     private void writeDefaultHeaderFields(ArrayList<String> fields) {
-        fields.add(Logger.concat("Date: ", new Date().toString()));
-        fields.add(Logger.concat("Server: ", "http.java/" + Http.VERSION,
+        fields.add(Logger.concat("Date:", new Date().toString()));
+        fields.add(Logger.concat("Server:", "http.java/" + Http.VERSION,
             "(" + System.getProperty("os.name") + ")", ""
         ));
         for (String key: UserSetHeaderFields.keySet()) {
-            fields.add(Logger.concat(key, ": ", UserSetHeaderFields.get(key)));
+            fields.add(Logger.concatNoSpaces(key, ": ", UserSetHeaderFields.get(key)));
         }
     }
 
@@ -80,7 +85,7 @@ public class HttpResponse {
             ArrayList<String> output = new ArrayList<>();
             output.add(Logger.concat("HTTP/1.1", String.valueOf(HttpResponseCode), HttpResponseCodes.get(HttpResponseCode)));
             writeDefaultHeaderFields(output);
-            output.add(Logger.concat("Content-Type: ", ResponseMIMEType));
+            output.add(Logger.concat("Content-Type:", ResponseMIMEType));
             this.writeHead(output);
         }
     }

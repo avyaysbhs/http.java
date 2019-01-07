@@ -5,7 +5,11 @@ public class Test {
         Express.App app = new Express.App();
 
         app.get("/index", (req, res) -> {
-            res.send("Hello world!");
+            res.sendFile("index.html", "text/html");
+        });
+
+        app.get("/image", (req, res) -> {
+            res.sendFile("SPACE.jpg", "image/jpeg");
         });
 
         app.get("/", (req, res) -> {
