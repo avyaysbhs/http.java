@@ -1,7 +1,8 @@
 package com.avyay.express;
 
+import javafx.util.Pair;
+
 import java.util.HashMap;
-import java.util.ArrayList;
 
 public class Express {
     private static HashMap<String, ExpressHandler> RequestHandlers = new HashMap<>();
@@ -9,8 +10,39 @@ public class Express {
 
     public static final com.avyay.http.java.Logger debug = new com.avyay.http.java.Logger(true);
 
-    private static String formatURL(String url) {
-        return url;
+    private static Pair<String, HashMap<String, String>> parseURLParams(HashMap<String, ExpressHandler> list, String url) {
+
+        String[] src = url.split("/");
+
+        if (src.length == 0) return null;
+
+        for (String key: list.keySet()) {
+
+            String[] parts = key.split("/");
+
+            if (parts.length == src.length && parts.length > 0) {
+
+                HashMap<String, String> out = new HashMap<>();
+                if (parts[0] == src[0]) {
+                    for (int i = 0; i < src.length; i++) {
+                        if (src[i] != parts[i]) {
+                            if (parts[i].startsWith(":")) {
+                                debug.log(parts[i], src[i]);
+                                out.put(
+                                    parts[i].replace(":", ""),
+                                    src[i]
+                                );
+                            }
+                        }
+                    }
+                    return new Pair<>(key, out);
+                }
+
+            } else {
+                return null;
+            }
+        }
+        return null;
     }
 
     public static class App {
@@ -30,24 +62,29 @@ public class Express {
 
         public void listen(int port) {
             com.avyay.http.java.Http.createServer((req, res) -> {
-                String srcURL = req.field("url");
-                String formattedURL = formatURL(srcURL); // Later implementation of url parameters and query args
-                ExpressRequest request = new ExpressRequest(req);
-                ExpressHandler appHandler = RequestHandlers.get(formattedURL);
-                if (appHandler == null) {
-                    for (Express.Router router : UsedRouters.keySet()) {
-                        ExpressHandler handler = router.RequestHandlers.get(formattedURL);
-                        if (handler != null) {
+                String URL = req.field("url");
+                String srcURL = URL.substring(0,
+                    URL.indexOf("?") == -1 ? URL.length() : URL.indexOf("?")
+                );
+                Pair<String, HashMap<String, String>> params = Express.parseURLParams(RequestHandlers, srcURL);
+                if (params == null) {
+                    for (Express.Router router: UsedRouters.keySet()) {
+                        Pair<String, HashMap<String, String>> rParams = Express.parseURLParams(router.RequestHandlers, srcURL);
+                        if (rParams != null) {
                             new Thread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    handler.handle(request, new ExpressResponse(res));
+                                    router.RequestHandlers.get(rParams.getKey()).handle(
+                                        new ExpressRequest(req, rParams.getValue(), URL), new ExpressResponse(res)
+                                    );
                                 }
                             }).start();
                         }
                     }
                 } else {
-                    appHandler.handle(request, new ExpressResponse(res));
+                    RequestHandlers.get(params.getKey()).handle(
+                        new ExpressRequest(req, params.getValue(), URL), new ExpressResponse(res)
+                    );
                 }
             }).listen(port);
         }

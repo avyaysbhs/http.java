@@ -61,7 +61,6 @@ public class HttpResponse {
                 head += field + "\r\n";
             }
             head += "\r\n";
-            System.out.println(head);
             try {
                 out.write(head.getBytes());
                 headWritten = true;
