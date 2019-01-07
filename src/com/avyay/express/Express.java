@@ -20,24 +20,21 @@ public class Express {
 
             String[] parts = key.split("/");
 
-            if (parts.length == src.length && parts.length > 0) {
-
+            if (parts.length == src.length) {
                 HashMap<String, String> out = new HashMap<>();
-                if (parts[0] == src[0]) {
-                    for (int i = 0; i < src.length; i++) {
-                        if (src[i] != parts[i]) {
-                            if (parts[i].startsWith(":")) {
-                                debug.log(parts[i], src[i]);
-                                out.put(
-                                    parts[i].replace(":", ""),
-                                    src[i]
-                                );
-                            }
+                for (int i = 0; i < src.length; i++) {
+                    if (!src[i].equals(parts[i])) {
+                        if (parts[i].startsWith(":")) {
+                            out.put(
+                                parts[i].replace(":", ""),
+                                src[i]
+                            );
+                        } else {
+                            return null;
                         }
                     }
-                    return new Pair<>(key, out);
                 }
-
+                return new Pair<>(key, out);
             } else {
                 return null;
             }
@@ -64,7 +61,7 @@ public class Express {
             com.avyay.http.java.Http.createServer((req, res) -> {
                 String URL = req.field("url");
                 String srcURL = URL.substring(0,
-                    URL.indexOf("?") == -1 ? URL.length() : URL.indexOf("?")
+                    URL.contains("?") ? URL.indexOf("?") : URL.length()
                 );
                 Pair<String, HashMap<String, String>> params = Express.parseURLParams(RequestHandlers, srcURL);
                 if (params == null) {

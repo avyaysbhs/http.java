@@ -12,7 +12,7 @@ public class ExpressRequest {
     public ExpressRequest(HttpRequest request, HashMap<String, String> params, String source) {
         this.params = params;
         qArgs = new HashMap<>();
-        if (source.indexOf("?") != -1) {
+        if (source.contains("?")) {
             source = source.substring(source.indexOf("?") + 1, source.length());
             String[] args = source.split("&");
             for (String arg: args) {
