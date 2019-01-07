@@ -1,7 +1,9 @@
 package com.avyay.express;
 
 import com.avyay.http.java.HttpResponse;
+
 import java.io.*;
+import java.nio.file.Files;
 
 public class ExpressResponse {
     private HttpResponse response;
@@ -16,8 +18,12 @@ public class ExpressResponse {
         response.end();
     }
 
-    private void sendImage(File file, String MIME) {
-
+    private void sendImage(File file, String MIME) throws IOException {
+        response.setHeader("Content-Length", file.length());
+        response.disableDefaultHeaders();
+        response.writeHead(200, MIME);
+        Files.copy(file.toPath(), response.getOutputStream());
+        response.end();
     }
 
     private void sendFile(File file, String MIME) throws IOException {
@@ -25,15 +31,15 @@ public class ExpressResponse {
             BufferedInputStream in = new BufferedInputStream(
                 new FileInputStream(file)
             );
-            if (MIME.contains("octet-stream")) {
+            if (MIME.contains("image"))
+                this.sendImage(file, MIME);
+            else {
                 response.setHeader("Content-Length", file.length());
                 byte[] buffer = new byte[in.available()];
                 in.read(buffer);
                 response.writeHead(200, MIME);
                 response.pipe(buffer);
                 response.end();
-            } else if (MIME.contains("image")) {
-                sendImage(file, MIME);
             }
         } else {
             throw new FileNotFoundException("Could not find file \""+ file.getName() +"\"");

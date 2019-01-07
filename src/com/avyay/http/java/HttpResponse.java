@@ -12,6 +12,7 @@ public class HttpResponse {
     private InputStream in;
     private static HashMap<Integer, String> HttpResponseCodes = new HashMap<>();
     private HashMap<String, String> UserSetHeaderFields = new HashMap<>();
+    private boolean defaultsEnabled = true;
 
     static {
         HttpResponseCodes.put(100, "Continue");
@@ -59,7 +60,7 @@ public class HttpResponse {
             for (String field : fields) {
                 head += field + "\r\n";
             }
-            head += "\r\n\r\n";
+            head += "\r\n";
             System.out.println(head);
             try {
                 out.write(head.getBytes());
@@ -71,10 +72,12 @@ public class HttpResponse {
     }
 
     private void writeDefaultHeaderFields(ArrayList<String> fields) {
-        fields.add(Logger.concat("Date:", new Date().toString()));
-        fields.add(Logger.concat("Server:", "http.java/" + Http.VERSION,
-            "(" + System.getProperty("os.name") + ")", ""
-        ));
+        if (defaultsEnabled) {
+            fields.add(Logger.concat("Date:", new Date().toString()));
+            fields.add(Logger.concat("Server:", "http.java/" + Http.VERSION,
+                    "(" + System.getProperty("os.name") + ")", ""
+            ));
+        }
         for (String key: UserSetHeaderFields.keySet()) {
             fields.add(Logger.concatNoSpaces(key, ": ", UserSetHeaderFields.get(key)));
         }
@@ -133,5 +136,13 @@ public class HttpResponse {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void disableDefaultHeaders() {
+        defaultsEnabled = false;
+    }
+
+    public OutputStream getOutputStream() {
+        return out;
     }
 }

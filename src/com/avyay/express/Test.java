@@ -9,7 +9,7 @@ public class Test {
         });
 
         app.get("/image", (req, res) -> {
-            res.sendFile("SPACE.jpg", "image/jpeg");
+            res.sendFile("test.gif", "image/gif");
         });
 
         app.get("/", (req, res) -> {
