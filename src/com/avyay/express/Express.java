@@ -1,12 +1,18 @@
 package com.avyay.express;
 
 import javafx.util.Pair;
-
 import java.util.HashMap;
 
 public class Express {
     private static HashMap<String, ExpressHandler> RequestHandlers = new HashMap<>();
     private static HashMap<Express.Router, Boolean> UsedRouters = new HashMap<>();
+    private static HashMap<Integer, ExpressHandler> DefaultResponses = new HashMap<>();
+
+    static {
+        DefaultResponses.put(404, (req, res) -> {
+            res.send("Cannot GET " + req.url);
+        });
+    }
 
     public static final com.avyay.http.java.Logger debug = new com.avyay.http.java.Logger(true);
 
@@ -17,12 +23,11 @@ public class Express {
         if (src.length == 0) return null;
 
         for (String key: list.keySet()) {
-
             String[] parts = key.split("/");
-
             if (parts.length == src.length) {
                 HashMap<String, String> out = new HashMap<>();
                 for (int i = 0; i < src.length; i++) {
+                    debug.log(src[i], parts[i], src[i].equals(parts[i]));
                     if (!src[i].equals(parts[i])) {
                         if (parts[i].startsWith(":")) {
                             out.put(
@@ -64,10 +69,13 @@ public class Express {
                     URL.contains("?") ? URL.indexOf("?") : URL.length()
                 );
                 Pair<String, HashMap<String, String>> params = Express.parseURLParams(RequestHandlers, srcURL);
+                debug.log(params, params == null);
                 if (params == null) {
+                    boolean found_handler = false;
                     for (Express.Router router: UsedRouters.keySet()) {
                         Pair<String, HashMap<String, String>> rParams = Express.parseURLParams(router.RequestHandlers, srcURL);
                         if (rParams != null) {
+                            found_handler = true;
                             new Thread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -77,6 +85,9 @@ public class Express {
                                 }
                             }).start();
                         }
+                    }
+                    if (!found_handler) {
+                        DefaultResponses.get(404).handle(new ExpressRequest(req, new HashMap<String, String>(), URL), new ExpressResponse(res));
                     }
                 } else {
                     RequestHandlers.get(params.getKey()).handle(

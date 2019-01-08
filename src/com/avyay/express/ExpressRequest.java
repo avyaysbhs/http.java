@@ -9,8 +9,10 @@ public class ExpressRequest {
     private HttpRequest request;
     private HashMap<String, String> _params;
     private HashMap<String, String> _query;
+    public String url;
 
     public ExpressRequest(HttpRequest request, HashMap<String, String> params, String source) {
+        url = request.field("url");
         _params = params;
         _query = new HashMap<>();
         if (source.contains("?")) {

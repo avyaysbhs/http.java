@@ -8,6 +8,10 @@ public class Test {
             res.sendFile("index.html", "text/html");
         });
 
+        app.get("/favicon.ico", (req, res) -> {
+            res.sendFile("test.gif", "image/gif");
+        });
+
         app.get("/image", (req, res) -> {
             res.sendFile("test.gif", "image/gif");
         });
@@ -27,6 +31,6 @@ public class Test {
 
         app.use(rt);
 
-        app.listen(3000);
+        app.listen(8080);
     }
 }
