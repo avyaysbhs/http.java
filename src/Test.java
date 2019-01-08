@@ -1,4 +1,4 @@
-import com.avyay.express.*;
+import com.avyay.express.Express;
 
 public class Test {
     public static void main(String[] args) {
